@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import {
   Text,
+  View,
+  Image,
+  Platform,
   ScrollView,
   BackHandler,
   NativeModules,
   TouchableOpacity,
-  Platform,
-  Image,
 } from 'react-native';
 import {
   PERMISSIONS,
@@ -19,7 +20,7 @@ import {
 const { MediaStore } = NativeModules;
 
 export default function Home() {
-  const [map, setMap] = useState<string[]>([]);
+  const [images, setImages] = useState<string[]>([]);
   useEffect(() => {
     if (Platform.OS !== 'android') return;
     requestPermission([
@@ -29,24 +30,33 @@ export default function Home() {
   }, []);
 
   return (
-    <ScrollView className="h-screen text-black">
-      {map.length == 0 && (
+    <View>
+      {images.length == 0 && (
         <TouchableOpacity
           className="h-24 bg-blue-500"
           onPress={() => {
-            MediaStore.getPdfFiles((str: string[]) => setMap(str));
+            MediaStore.getPdfFiles((img: string[]) => setImages(img));
           }}>
-          <Text className="text-black text-center">Display pdf thumbnails!</Text>
+          <Text className="text-black text-center">
+            Display pdf thumbnails!
+          </Text>
         </TouchableOpacity>
       )}
-      {map.length > 0 &&
-        map.map(m => (
-          <Image
-            source={{ uri: `data:image/png;base64,${m}` }}
-            style={{ width: 480, height: 300 }}
-          />
-        ))}
-    </ScrollView>
+      <ScrollView>
+        {images.length > 0 &&
+          images.map((img64, idx) => (
+            <Image
+              key={idx}
+              style={{
+                resizeMode: 'contain',
+                flex: 1,
+                aspectRatio: 1,
+              }}
+              source={{ uri: `data:image/png;base64,${img64}` }}
+            />
+          ))}
+      </ScrollView>
+    </View>
   );
 }
 
