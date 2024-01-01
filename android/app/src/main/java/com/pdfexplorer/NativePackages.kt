@@ -15,5 +15,5 @@ class NativePackages : ReactPackage {
 
     override fun createNativeModules(
         reactContext: ReactApplicationContext
-    ): MutableList<NativeModule> = mutableListOf(MediaStore(reactContext))
+    ): MutableList<NativeModule> = mutableListOf(MediaStoreModule(reactContext))
 }
