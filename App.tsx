@@ -1,13 +1,23 @@
 import React from 'react';
-import Home from './src/Home';
-import { View, useColorScheme } from 'react-native';
+import Home from './src/screens/Home';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-export default function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const Stack = createNativeStackNavigator();
 
+export default function App(): React.ReactElement {
   return (
-    <View>
-      <Home />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator
+        screenOptions={{
+          headerTitle: 'PdfExplorer',
+          headerTitleAlign: 'center',
+          headerTitleStyle: {
+            fontFamily: '',
+          },
+        }}>
+        <Stack.Screen name="Home" component={Home} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
