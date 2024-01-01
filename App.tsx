@@ -12,9 +12,6 @@ export default function App(): React.ReactElement {
         screenOptions={{
           headerTitle: 'PdfExplorer',
           headerTitleAlign: 'center',
-          headerTitleStyle: {
-            fontFamily: '',
-          },
         }}>
         <Stack.Screen name="Home" component={Home} />
       </Stack.Navigator>
