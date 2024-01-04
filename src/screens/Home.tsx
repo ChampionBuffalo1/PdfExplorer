@@ -1,66 +1,58 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { View, Text, Platform, BackHandler, NativeModules } from 'react-native';
 import {
-  Text,
-  View,
-  Image,
-  Platform,
-  ScrollView,
-  BackHandler,
-  NativeModules,
-  TouchableOpacity,
-} from 'react-native';
-import {
-  PERMISSIONS,
-  Permission,
-  RESULTS,
   check,
   request,
+  RESULTS,
+  Permission,
+  PERMISSIONS,
 } from 'react-native-permissions';
+import { FlashList } from '@shopify/flash-list';
+import PdfInfoCard from '../components/PdfInfoCard';
 
 const { MediaStore } = NativeModules;
 
+export interface MediaReturnType {
+  uri: string;
+  name: string;
+  size: number;
+  createdAt: string;
+}
+
 export default function Home() {
-  const [images, setImages] = useState<string[]>([]);
+  const [docInfo, setDocInfo] = useState<MediaReturnType[]>([]);
+
   useEffect(() => {
     if (Platform.OS !== 'android') return;
     requestPermission([
       PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
       PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
     ]);
+    MediaStore.getPdfFiles((info: MediaReturnType[]) => setDocInfo(info));
   }, []);
 
   return (
-    <View>
-      {images.length == 0 && (
-        <TouchableOpacity
-          className="h-24 bg-blue-500"
-          onPress={() => {
-            MediaStore.getPdfFiles((img: string[]) => setImages(img));
-          }}>
-          <Text className="text-black text-center">
-            Display pdf thumbnails!
-          </Text>
-        </TouchableOpacity>
+    <View className="bg-[#0d0d0df4] w-full h-full">
+      {Platform.OS !== 'android' && (
+        <Text>
+          The App currently uses an Android only API and is not available on
+          other platforms
+        </Text>
       )}
-      <ScrollView>
-        {images.length > 0 &&
-          images.map((img64, idx) => (
-            <Image
-              key={idx}
-              style={{
-                resizeMode: 'contain',
-                flex: 1,
-                aspectRatio: 1,
-              }}
-              source={{ uri: `data:image/png;base64,${img64}` }}
-            />
-          ))}
-      </ScrollView>
+      {Platform.OS === 'android' && (
+        <FlashList
+          data={docInfo}
+          renderItem={({ item, index }) => (
+            <PdfInfoCard {...item} key={index} />
+          )}
+          estimatedItemSize={360}
+        />
+      )}
     </View>
   );
 }
 
-async function requestPermission(permissions: Permission[]) {
+function requestPermission(permissions: Permission[]) {
   for (const permission of permissions) {
     check(permission).then(result => {
       switch (result) {
