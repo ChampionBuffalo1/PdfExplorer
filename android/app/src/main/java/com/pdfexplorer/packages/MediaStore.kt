@@ -1,59 +1,56 @@
 package com.pdfexplorer
 
-
 import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.Environment
 import android.util.Base64
-import android.util.Size
+import androidx.core.net.toUri
 import com.facebook.react.bridge.Callback
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableNativeArray
+import com.facebook.react.bridge.WritableNativeMap
 import java.io.ByteArrayOutputStream
 import java.io.File
-
 
 class MediaStoreModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
     override fun getName() = "MediaStore"
 
-
     @ReactMethod
     fun getPdfFiles(callback: Callback) {
-        callback(getAllPdfFileNames())
-    }
-
-
-    private fun getAllPdfFileNames(): WritableNativeArray {
-        val pdfFileNames = WritableNativeArray()
-
+        val pdfFiles = WritableNativeArray()
         val externalStorageDir =
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
 
         if (externalStorageDir.canRead()) {
-            // Recursive function to traverse the directory and find PDF files
-            getAllPdfFileNamesRecursive(externalStorageDir, pdfFileNames)
+            getAllPdfFileNamesRecursive(externalStorageDir, pdfFiles)
         }
-        return pdfFileNames
+        callback(pdfFiles)
+    }
+
+    @ReactMethod
+    fun getThumbnail(uri: String, callback: Callback) {
+        val fileUri = Uri.parse(uri)
+        val file = fileUri.path?.let { File(it) }
+        val thumbnail = file?.let { generatePdfThumbnail(it) } ?: return
+        val b64map = bitmapToBase64(thumbnail)
+        callback(b64map)
     }
 
     private fun getAllPdfFileNamesRecursive(directory: File, pdfFileNames: WritableNativeArray) {
-        val files = directory.listFiles()
-        if (files == null) return;
+        val files = directory.listFiles() ?: return
         for (file in files) {
             if (file.isDirectory) {
                 getAllPdfFileNamesRecursive(file, pdfFileNames)
             } else if (file.isFile && file.extension.equals("pdf", true)) {
-//                        pdfFileNames.pushString(file.name)
-                val thumbnail = generatePdfThumbnail(file)
-                if (thumbnail != null) {
-                    val encodedThumbnail = bitmapToBase64(thumbnail)
-                    pdfFileNames.pushString(encodedThumbnail)
-                }
+                val map = WritableNativeMap()
+                map.putString("name", file.name)
+                map.putString("uri", file.toUri().toString())
+                pdfFileNames.pushMap(map)
             }
         }
     }
@@ -61,23 +58,16 @@ class MediaStoreModule(reactContext: ReactApplicationContext) :
     private fun generatePdfThumbnail(pdfFile: File): Bitmap? {
         try {
             val resolver: ContentResolver = reactApplicationContext.contentResolver
-
             val uri = Uri.fromFile(pdfFile)
-            val parcelFileDescriptor =
-                resolver.openFileDescriptor(uri, "r") ?: return null
+            val parcelFileDescriptor = resolver.openFileDescriptor(uri, "r") ?: return null
+            PdfRenderer(parcelFileDescriptor).use { render ->
+                val page = render.openPage(0)
+                val bitmap = Bitmap.createBitmap(600, 600, Bitmap.Config.ARGB_8888)
+                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
 
-            val pdfRenderer = PdfRenderer(parcelFileDescriptor)
-            val page = pdfRenderer.openPage(0)
-
-            // Create a Bitmap to render the page
-            val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
-            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-
-            // Close the page and the renderer
-            page.close()
-            pdfRenderer.close()
-
-            return bitmap
+                page.close()
+                return bitmap
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
