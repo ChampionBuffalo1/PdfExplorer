@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, Platform, BackHandler, NativeModules } from 'react-native';
+import { View, Text, Platform, BackHandler } from 'react-native';
 import {
   check,
   request,
@@ -9,18 +9,10 @@ import {
 } from 'react-native-permissions';
 import { FlashList } from '@shopify/flash-list';
 import PdfInfoCard from '../components/PdfInfoCard';
-
-const { MediaStore } = NativeModules;
-
-export interface MediaReturnType {
-  uri: string;
-  name: string;
-  size: number;
-  createdAt: string;
-}
+import MediaStore, { FileInfo } from '../MediaStore';
 
 export default function Home() {
-  const [docInfo, setDocInfo] = useState<MediaReturnType[]>([]);
+  const [docInfo, setDocInfo] = useState<FileInfo[]>([]);
 
   useEffect(() => {
     if (Platform.OS !== 'android') return;
@@ -28,7 +20,7 @@ export default function Home() {
       PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
       PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
     ]);
-    MediaStore.getPdfFiles((info: MediaReturnType[]) => setDocInfo(info));
+    MediaStore.getPdfFiles(setDocInfo);
   }, []);
 
   return (
@@ -45,6 +37,7 @@ export default function Home() {
           renderItem={({ item, index }) => (
             <PdfInfoCard {...item} key={index} />
           )}
+          // Use the element Inspector (in DevMenu) to find the size of the item
           estimatedItemSize={360}
         />
       )}

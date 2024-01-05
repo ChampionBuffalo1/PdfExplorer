@@ -1,7 +1,7 @@
-import { MediaReturnType } from '../screens/Home';
+import { FileInfo } from '../MediaStore';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 
-export default function PdfInfoCard({ name }: MediaReturnType) {
+export default function PdfInfoCard({ name }: FileInfo) {
   return (
     <TouchableOpacity
       // TODO: Render the pdf or navigate to the pdf renderer
