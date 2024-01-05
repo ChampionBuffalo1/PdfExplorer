@@ -14,7 +14,6 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.WritableNativeArray
 import com.facebook.react.bridge.WritableNativeMap
 import java.io.ByteArrayOutputStream
-import java.io.File
 
 class MediaStoreModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
@@ -35,8 +34,7 @@ class MediaStoreModule(reactContext: ReactApplicationContext) :
     @ReactMethod
     fun getThumbnail(uri: String, callback: Callback) {
         val fileUri = Uri.parse(uri)
-        val file = fileUri.path?.let { File(it) }
-        val thumbnail = file?.let { generatePdfThumbnail(it) } ?: return
+        val thumbnail = generatePdfThumbnail(fileUri) ?: return null
         val b64map = bitmapToBase64(thumbnail)
         callback(b64map)
     }
@@ -55,10 +53,9 @@ class MediaStoreModule(reactContext: ReactApplicationContext) :
         }
     }
 
-    private fun generatePdfThumbnail(pdfFile: File): Bitmap? {
+    private fun generatePdfThumbnail(uri: Uri): Bitmap? {
         try {
             val resolver: ContentResolver = reactApplicationContext.contentResolver
-            val uri = Uri.fromFile(pdfFile)
             val parcelFileDescriptor = resolver.openFileDescriptor(uri, "r") ?: return null
             PdfRenderer(parcelFileDescriptor).use { render ->
                 val page = render.openPage(0)
