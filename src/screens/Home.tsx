@@ -13,6 +13,7 @@ import MediaStore, { FileInfo } from '../MediaStore';
 
 export default function Home() {
   const [docInfo, setDocInfo] = useState<FileInfo[]>([]);
+  const [inViewKeys, setInViewKeys] = useState<string[]>([]);
 
   useEffect(() => {
     if (Platform.OS !== 'android') return;
@@ -34,9 +35,18 @@ export default function Home() {
       {Platform.OS === 'android' && (
         <FlashList
           data={docInfo}
-          renderItem={({ item, index }) => (
-            <PdfInfoCard {...item} key={index} />
+          extraData={inViewKeys}
+          keyExtractor={item => item.uri}
+          renderItem={({ item, extraData }) => (
+            <PdfInfoCard {...item} isVisible={extraData.includes(item.uri)} />
           )}
+          onViewableItemsChanged={info =>
+            setInViewKeys(info.viewableItems.map(item => item.key))
+          }
+          viewabilityConfig={{
+            itemVisiblePercentThreshold: 30,
+            minimumViewTime: 1000, // 1s
+          }}
           // Use the element Inspector (in DevMenu) to find the size of the item
           estimatedItemSize={360}
         />
