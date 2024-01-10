@@ -1,17 +1,32 @@
 import { FileInfo } from '../MediaStore';
+import { useNavigation } from '@react-navigation/native';
+
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 
-export default function PdfInfoCard({ name }: FileInfo) {
+export default function PdfInfoCard({
+  uri,
+  name,
+}: FileInfo & {
+  isVisible: boolean;
+}) {
+  const navigation = useNavigation();
+
   return (
     <TouchableOpacity
-      // TODO: Render the pdf or navigate to the pdf renderer
-      onPress={() => console.log('pressing: ' + name)}
-      className="h-20 border mt-2 border-white rounded-md">
+      onPress={() => {
+        // @ts-expect-error: Not Typed function
+        navigation.navigate('PdfView', { uri });
+      }}
+      className="h-20 rounded-md bg-[#0a0a08]">
       <View className="flex items-center flex-row h-full">
         <View className="border border-r-white h-full w-20 items-center justify-center">
+          {/* TODO: Generate PDF Thumbnails */}
           <Image
-            // TODO: Fetch the thumbnail using the Uri
-            src="https://upload.wikimedia.org/wikipedia/commons/f/f0/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006_edit_1.jpg"
+            source={
+              {
+                //   uri: tbUri,
+              }
+            }
             style={{
               resizeMode: 'contain',
               aspectRatio: 1,
@@ -22,7 +37,7 @@ export default function PdfInfoCard({ name }: FileInfo) {
         </View>
 
         <View className="flex left-2">
-          <Text className="text-sm">{name}</Text>
+          <Text className="text-sm whitespace-nowrap">{name}</Text>
         </View>
       </View>
     </TouchableOpacity>
