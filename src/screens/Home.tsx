@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import { FlashList } from '@shopify/flash-list';
+import PdfInfoCard from '../components/PdfInfoCard';
+import MediaStore, { FileInfo } from '../MediaStore';
 import { View, Text, Platform, BackHandler } from 'react-native';
 import {
   check,
@@ -7,22 +10,23 @@ import {
   Permission,
   PERMISSIONS,
 } from 'react-native-permissions';
-import { FlashList } from '@shopify/flash-list';
-import PdfInfoCard from '../components/PdfInfoCard';
-import MediaStore, { FileInfo } from '../MediaStore';
 
 export default function Home() {
   const [docInfo, setDocInfo] = useState<FileInfo[]>([]);
   const [inViewKeys, setInViewKeys] = useState<string[]>([]);
 
   useEffect(() => {
-    if (Platform.OS !== 'android') return;
+    if (Platform.OS !== 'android') {
+      return;
+    }
     requestPermission([
       PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
       PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
     ]);
-    MediaStore.getPdfFiles(setDocInfo);
-  }, []);
+    if (setDocInfo) {
+      MediaStore.getPdfFiles(setDocInfo);
+    }
+  }, [setDocInfo]);
 
   return (
     <View className="bg-[#0d0d0df4] w-full h-full">
@@ -66,8 +70,9 @@ function requestPermission(permissions: Permission[]) {
         }
         case RESULTS.DENIED: {
           request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE).then(result => {
-            if (result !== RESULTS.GRANTED)
+            if (result !== RESULTS.GRANTED) {
               setTimeout(() => BackHandler.exitApp(), 1000);
+            }
           });
           break;
         }
