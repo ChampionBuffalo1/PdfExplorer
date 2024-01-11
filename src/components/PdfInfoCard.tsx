@@ -1,22 +1,26 @@
-import { useEffect, useState } from 'react';
 import { FileInfo } from '../utils';
+import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-
-import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { CachedFileData, getFileFromCache } from '../kvStore';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
-export default function PdfInfoCard({
-  path,
-  name,
-}: FileInfo & {
+type InfoCardProps = FileInfo & {
   isVisible: boolean;
-}) {
+};
+
+export default function PdfInfoCard({ name, path, isVisible }: InfoCardProps) {
   const navigation = useNavigation();
   const [metadata, setMetadata] = useState<CachedFileData>();
 
   useEffect(() => {
     setMetadata(getFileFromCache(name));
   }, []);
+
+  useEffect(() => {
+    if (isVisible) {
+      // TODO: Generate PDF Thumbnail Image or Retrieve From Cache
+    }
+  }, [isVisible]);
 
   return (
     <TouchableOpacity
@@ -30,12 +34,7 @@ export default function PdfInfoCard({
           <Image
             // TODO: Generate the Thumbnail URI
             src="uri"
-            style={{
-              resizeMode: 'contain',
-              aspectRatio: 1,
-              width: '100%',
-              height: '100%',
-            }}
+            style={styles.thumbnailImage}
           />
         </View>
 
@@ -46,3 +45,12 @@ export default function PdfInfoCard({
     </TouchableOpacity>
   );
 }
+
+const styles = StyleSheet.create({
+  thumbnailImage: {
+    resizeMode: 'contain',
+    aspectRatio: 1,
+    width: '100%',
+    height: '100%',
+  },
+});
