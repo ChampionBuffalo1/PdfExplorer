@@ -4,7 +4,7 @@ import {
 } from '@react-navigation/native-stack';
 
 interface PdfViewerType {
-  uri: string;
+  path: string;
 }
 
 export type StackNavigator = {

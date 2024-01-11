@@ -7,8 +7,8 @@ export default function PdfView({ route }: StackScreenProps<'PdfView'>) {
   const [uri, setUri] = useState<string>('');
 
   useEffect(() => {
-    if (route.params?.uri) {
-      setUri(route.params.uri);
+    if (route.params?.path) {
+      setUri(route.params.path);
     }
   }, [route, setUri]);
 
