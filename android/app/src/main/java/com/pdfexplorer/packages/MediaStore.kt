@@ -1,36 +1,20 @@
 package com.pdfexplorer
 
-import android.content.ContentResolver
 import android.graphics.Bitmap
+import android.content.ContentResolver
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
-import android.os.Environment
+import android.util.Log
 import android.util.Base64
-import androidx.core.net.toUri
 import com.facebook.react.bridge.Callback
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.WritableNativeArray
-import com.facebook.react.bridge.WritableNativeMap
 import java.io.ByteArrayOutputStream
-import java.io.File
 
 class MediaStoreModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
     override fun getName() = "MediaStore"
-
-    @ReactMethod
-    fun getPdfFiles(callback: Callback) {
-        val pdfFiles = WritableNativeArray()
-        val externalStorageDir =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-
-        if (externalStorageDir.canRead()) {
-            getAllPdfFileNamesRecursive(externalStorageDir, pdfFiles)
-        }
-        callback(pdfFiles)
-    }
 
     @ReactMethod
     fun getThumbnail(uri: String, callback: Callback) {
@@ -38,20 +22,6 @@ class MediaStoreModule(reactContext: ReactApplicationContext) :
         val thumbnail = generatePdfThumbnail(fileUri) ?: return
         val b64map = bitmapToBase64(thumbnail)
         callback(b64map)
-    }
-
-    private fun getAllPdfFileNamesRecursive(directory: File, pdfFileNames: WritableNativeArray) {
-        val files = directory.listFiles() ?: return
-        for (file in files) {
-            if (file.isDirectory) {
-                getAllPdfFileNamesRecursive(file, pdfFileNames)
-            } else if (file.isFile && file.extension.equals("pdf", true)) {
-                val map = WritableNativeMap()
-                map.putString("name", file.name)
-                map.putString("uri", file.toUri().toString())
-                pdfFileNames.pushMap(map)
-            }
-        }
     }
 
     private fun generatePdfThumbnail(uri: Uri): Bitmap? {
@@ -74,8 +44,8 @@ class MediaStoreModule(reactContext: ReactApplicationContext) :
 
     private fun bitmapToBase64(bitmap: Bitmap): String {
         val byteArrayOutputStream = ByteArrayOutputStream()
-        // 20% quality
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, byteArrayOutputStream)
+        // 70% quality
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
