@@ -24,7 +24,11 @@ export function getFileFromCache(fileName: string): CachedFileData | undefined {
 
 type FileStatus = 'COMPLETED' | 'NOT_STARTED' | 'ONGOING';
 export interface CachedFileData {
-  totalPages: number;
+  path: string;
+  modifiedAt: Date;
+  thumbnail: string;
   readPages: number;
+  totalPages: number;
   status: FileStatus;
+  isPasswordProtected: boolean;
 }
