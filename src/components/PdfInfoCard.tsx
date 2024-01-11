@@ -13,8 +13,10 @@ export default function PdfInfoCard({ name, path, isVisible }: InfoCardProps) {
   const [metadata, setMetadata] = useState<CachedFileData>();
 
   useEffect(() => {
-    setMetadata(getFileFromCache(name));
-  }, []);
+    if (name) {
+      setMetadata(getFileFromCache(name));
+    }
+  }, [name]);
 
   useEffect(() => {
     if (isVisible) {
@@ -32,7 +34,7 @@ export default function PdfInfoCard({ name, path, isVisible }: InfoCardProps) {
       <View className="flex items-center flex-row h-full">
         <View className="border border-r-white h-full w-20 items-center justify-center">
           <Image
-            // TODO: Generate the Thumbnail URI
+            // TODO: Show the PDF
             src="uri"
             style={styles.thumbnailImage}
           />
