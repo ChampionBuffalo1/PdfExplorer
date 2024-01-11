@@ -29,6 +29,12 @@ dependencies:
   react-native-blob-util:
     specifier: ^0.19.6
     version: 0.19.6(react-native@0.73.1)(react@18.2.0)
+  react-native-fs:
+    specifier: ^2.20.0
+    version: 2.20.0(react-native@0.73.1)
+  react-native-mmkv:
+    specifier: ^2.11.0
+    version: 2.11.0(react-native@0.73.1)(react@18.2.0)
   react-native-pdf:
     specifier: ^6.7.4
     version: 6.7.4(react-native-blob-util@0.19.6)(react-native@0.73.1)(react@18.2.0)
@@ -44,6 +50,9 @@ dependencies:
   react-native-svg:
     specifier: ^14.1.0
     version: 14.1.0(react-native@0.73.1)(react@18.2.0)
+  shorthash2:
+    specifier: ^1.0.3
+    version: 1.0.3
 
 devDependencies:
   '@babel/core':
@@ -6324,6 +6333,30 @@ packages:
       react-native: 0.73.1(@babel/core@7.23.6)(@babel/preset-env@7.23.6)(react@18.2.0)
     dev: false
 
+  /react-native-fs@2.20.0(react-native@0.73.1):
+    resolution: {integrity: sha512-VkTBzs7fIDUiy/XajOSNk0XazFE9l+QlMAce7lGuebZcag5CnjszB+u4BdqzwaQOdcYb5wsJIsqq4kxInIRpJQ==}
+    peerDependencies:
+      react-native: '*'
+      react-native-windows: '*'
+    peerDependenciesMeta:
+      react-native-windows:
+        optional: true
+    dependencies:
+      base-64: 0.1.0
+      react-native: 0.73.1(@babel/core@7.23.6)(@babel/preset-env@7.23.6)(react@18.2.0)
+      utf8: 3.0.0
+    dev: false
+
+  /react-native-mmkv@2.11.0(react-native@0.73.1)(react@18.2.0):
+    resolution: {integrity: sha512-28PdUHjZJmAw3q+8zJDAAdohnZMpDC7WgRUJxACOMkcmJeqS3u5cKS/lSq2bhf1CvaeIiHYHUWiyatUjMRCDQQ==}
+    peerDependencies:
+      react: '*'
+      react-native: '>=0.71.0'
+    dependencies:
+      react: 18.2.0
+      react-native: 0.73.1(@babel/core@7.23.6)(@babel/preset-env@7.23.6)(react@18.2.0)
+    dev: false
+
   /react-native-pdf@6.7.4(react-native-blob-util@0.19.6)(react-native@0.73.1)(react@18.2.0):
     resolution: {integrity: sha512-sBeNcsrTRnLjmiU9Wx7Uk0K2kPSQtKIIG+FECdrEG16TOdtmQ3iqqEwt0dmy0pJegpg07uES5BXqiKsKkRUIFw==}
     peerDependencies:
@@ -6800,6 +6833,10 @@ packages:
 
   /shell-quote@1.8.1:
     resolution: {integrity: sha512-6j1W9l1iAs/4xYBI1SYOVZyFcCis9b4KCLQ8fgAGG07QvzaRLVVRQvAy85yNmmZSjYjg4MWh4gNvlPujU/5LpA==}
+    dev: false
+
+  /shorthash2@1.0.3:
+    resolution: {integrity: sha512-oB8s64JsyJ2xhHJlnTwGg++Y3BTF6XnXeXMC7OygD8vtNcCRDiMxEGONvUOeZbxfwEXENmRlqPDouMR/OtGDsw==}
     dev: false
 
   /side-channel@1.0.4:
@@ -7307,6 +7344,10 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
       react: 18.2.0
+    dev: false
+
+  /utf8@3.0.0:
+    resolution: {integrity: sha512-E8VjFIQ/TyQgp+TZfS6l8yp/xWppSAHzidGiRrqe4bK4XP9pTRyKFgGJpO3SN7zdX4DeomTrwaseCHovfpFcqQ==}
     dev: false
 
   /util-deprecate@1.0.2:
