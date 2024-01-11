@@ -1,4 +1,4 @@
-import RNFS, { ReadDirItem } from 'react-native-fs';
+import RNFS from 'react-native-fs';
 import { BackHandler } from 'react-native';
 import {
   check,
@@ -18,8 +18,8 @@ export function requestPermission(permissions: Permission[]) {
           break;
         }
         case RESULTS.DENIED: {
-          request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE).then(result => {
-            if (result !== RESULTS.GRANTED) {
+          request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE).then(res => {
+            if (res !== RESULTS.GRANTED) {
               setTimeout(() => BackHandler.exitApp(), 1000);
             }
           });

@@ -10,7 +10,9 @@ export function updateFileCache(
   value: Record<string, unknown>,
 ): boolean {
   const key = getKey(fileName);
-  if (store.contains(key)) return false;
+  if (store.contains(key)) {
+    return false;
+  }
   store.set(key, JSON.stringify(value));
   return true;
 }
@@ -18,7 +20,9 @@ export function updateFileCache(
 export function getFileFromCache(fileName: string): CachedFileData | undefined {
   const key = getKey(fileName);
   const value = store.getString(key);
-  if (!value) return;
+  if (!value) {
+    return;
+  }
   return JSON.parse(value);
 }
 
