@@ -1,32 +1,35 @@
-import { FileInfo } from '../MediaStore';
+import { useEffect, useState } from 'react';
+import { FileInfo } from '../utils';
 import { useNavigation } from '@react-navigation/native';
 
 import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { CachedFileData, getFileFromCache } from '../kvStore';
 
 export default function PdfInfoCard({
-  uri,
+  path,
   name,
 }: FileInfo & {
   isVisible: boolean;
 }) {
   const navigation = useNavigation();
+  const [metadata, setMetadata] = useState<CachedFileData>();
+
+  useEffect(() => {
+    setMetadata(getFileFromCache(name));
+  }, []);
 
   return (
     <TouchableOpacity
       onPress={() => {
         // @ts-expect-error: Not Typed function
-        navigation.navigate('PdfView', { uri });
+        navigation.navigate('PdfView', { path });
       }}
       className="h-20 rounded-md bg-[#0a0a08]">
       <View className="flex items-center flex-row h-full">
         <View className="border border-r-white h-full w-20 items-center justify-center">
-          {/* TODO: Generate PDF Thumbnails */}
           <Image
-            source={
-              {
-                //   uri: tbUri,
-              }
-            }
+            // TODO: Generate the Thumbnail URI
+            src="uri"
             style={{
               resizeMode: 'contain',
               aspectRatio: 1,
