@@ -1,12 +1,6 @@
 import RNFS from 'react-native-fs';
 import { BackHandler } from 'react-native';
-import {
-  check,
-  request,
-  RESULTS,
-  Permission,
-  PERMISSIONS,
-} from 'react-native-permissions';
+import { check, request, RESULTS, Permission } from 'react-native-permissions';
 
 export function requestPermission(permissions: Permission[]) {
   for (const permission of permissions) {
@@ -18,7 +12,7 @@ export function requestPermission(permissions: Permission[]) {
           break;
         }
         case RESULTS.DENIED: {
-          request(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE).then(res => {
+          request(permission).then(res => {
             if (res !== RESULTS.GRANTED) {
               setTimeout(() => BackHandler.exitApp(), 1000);
             }
