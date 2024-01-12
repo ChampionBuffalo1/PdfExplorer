@@ -7,14 +7,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator<StackNavigator>();
+const header = () => <Header appName="PdfExplorer" />;
 
 export default function App(): ReactElement {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          header: () => <Header appName="PdfExplorer" />,
-        }}>
+      <Stack.Navigator screenOptions={{ header }}>
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="PdfView" component={PdfView} />
       </Stack.Navigator>
