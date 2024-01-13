@@ -23,8 +23,8 @@ export default function RenderFiles() {
         setInViewKeys(info.viewableItems.map(item => item.key))
       }
       viewabilityConfig={{
-        itemVisiblePercentThreshold: 30,
-        minimumViewTime: 1000, // 1s
+        itemVisiblePercentThreshold: 40,
+        minimumViewTime: 500, // 0.5s
       }}
       // Use the element Inspector (in DevMenu) to find the size of the item
       estimatedItemSize={360}
