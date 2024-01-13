@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
 import { requestPermission } from '../utils';
-import { View, Text, Platform } from 'react-native';
 import RenderFiles from '../components/RenderFiles';
+import { View, Text, Platform } from 'react-native';
 import { PERMISSIONS } from 'react-native-permissions';
+import FilterButton from '../components/FilterButton';
 
 export default function Home() {
   useEffect(() => {
@@ -15,15 +16,18 @@ export default function Home() {
     ]);
   }, []);
 
+  if (Platform.OS !== 'android')
+    return (
+      <Text>
+        The App currently uses an Android only API and is not available on other
+        platforms
+      </Text>
+    );
+
   return (
-    <View className="bg-[#0d0d0df4] w-full h-full">
-      {Platform.OS !== 'android' && (
-        <Text>
-          The App currently uses an Android only API and is not available on
-          other platforms
-        </Text>
-      )}
-      {Platform.OS === 'android' && <RenderFiles />}
+    <View className="bg-[#0a0a08] w-full h-full">
+      <FilterButton />
+      <RenderFiles />
     </View>
   );
 }
