@@ -2,39 +2,66 @@ package com.pdfexplorer
 
 import android.graphics.Bitmap
 import android.content.ContentResolver
+import android.graphics.Color
+import android.graphics.Canvas
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.util.Log
 import android.util.Base64
-import com.facebook.react.bridge.Callback
+import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import java.io.ByteArrayOutputStream
+import java.io.File
 
 class MediaStoreModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
     override fun getName() = "MediaStore"
 
     @ReactMethod
-    fun getThumbnail(uri: String, callback: Callback) {
-        val fileUri = Uri.parse(uri)
-        val thumbnail = generatePdfThumbnail(fileUri) ?: return
-        val b64map = bitmapToBase64(thumbnail)
-        callback(b64map)
+    fun getThumbnail(path: String, promise: Promise) {
+        getThumbnailWithOptions(path, null, null, null, promise)
     }
 
-    private fun generatePdfThumbnail(uri: Uri): Bitmap? {
+    @ReactMethod
+    fun getThumbnailWithOptions(path: String, quality: Int?, width: Int?, height: Int?, promise: Promise) {
+        val file = File(path)
+        if (!file.canRead()) {
+            promise.reject("FILE_CANNOT_BE_READ", "File cannot be read")
+            return
+        }
+
+        if (quality != null && (quality <= 0 || quality > 100)) {
+            promise.reject("INVALID_QUALITY", "Quality must be in the range [1, 100]")
+            return
+        }
+        
+        val thumbnail = generatePdfThumbnail(file, width, height) ?: run {
+            promise.reject("THUMBNAIL_GENERATION_ERROR", "Error generating PDF thumbnail")
+            return
+        }
+        val b64map = bitmapToBase64(thumbnail, quality ?: DEFAULT_QUALITY)
+        promise.resolve(b64map)
+    }
+
+    private fun generatePdfThumbnail(file: File, width: Int?, height: Int?): Bitmap? {
         try {
             val resolver: ContentResolver = reactApplicationContext.contentResolver
-            val parcelFileDescriptor = resolver.openFileDescriptor(uri, "r") ?: return null
+            val parcelFileDescriptor = resolver.openFileDescriptor(Uri.fromFile(file), "r") ?: return null
             PdfRenderer(parcelFileDescriptor).use { render ->
-                val page = render.openPage(0)
-                val bitmap = Bitmap.createBitmap(600, 600, Bitmap.Config.ARGB_8888)
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                val currentPage = render.openPage(0)
+                val bitmap = Bitmap.createBitmap(width ?: currentPage.width, height ?: currentPage.height, Bitmap.Config.ARGB_8888)
+                bitmap.eraseColor(Color.WHITE)
+                currentPage.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                currentPage.close()
 
-                page.close()
-                return bitmap
+                val bitmapWhiteBG = Bitmap.createBitmap(bitmap.width, bitmap.height, bitmap.config)
+                val canvas = Canvas(bitmapWhiteBG)
+                canvas.drawBitmap(bitmap, 0f, 0f, null)
+                bitmap.recycle()
+
+                return bitmapWhiteBG
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -42,11 +69,14 @@ class MediaStoreModule(reactContext: ReactApplicationContext) :
         return null
     }
 
-    private fun bitmapToBase64(bitmap: Bitmap): String {
+    private fun bitmapToBase64(bitmap: Bitmap, quality: Int): String {
         val byteArrayOutputStream = ByteArrayOutputStream()
-        // 70% quality
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
+
+    companion object {
+        private const val DEFAULT_QUALITY = 80
     }
 }
