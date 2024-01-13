@@ -25,7 +25,13 @@ class MediaStoreModule(reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun getThumbnailWithOptions(path: String, quality: Int?, width: Int?, height: Int?, promise: Promise) {
+    fun getThumbnailWithOptions(
+        path: String,
+        quality: Int?,
+        width: Int?,
+        height: Int?,
+        promise: Promise
+    ) {
         val file = File(path)
         if (!file.canRead()) {
             promise.reject("FILE_CANNOT_BE_READ", "File cannot be read")
@@ -36,7 +42,7 @@ class MediaStoreModule(reactContext: ReactApplicationContext) :
             promise.reject("INVALID_QUALITY", "Quality must be in the range [1, 100]")
             return
         }
-        
+
         val thumbnail = generatePdfThumbnail(file, width, height) ?: run {
             promise.reject("THUMBNAIL_GENERATION_ERROR", "Error generating PDF thumbnail")
             return
@@ -48,10 +54,15 @@ class MediaStoreModule(reactContext: ReactApplicationContext) :
     private fun generatePdfThumbnail(file: File, width: Int?, height: Int?): Bitmap? {
         try {
             val resolver: ContentResolver = reactApplicationContext.contentResolver
-            val parcelFileDescriptor = resolver.openFileDescriptor(Uri.fromFile(file), "r") ?: return null
+            val parcelFileDescriptor =
+                resolver.openFileDescriptor(Uri.fromFile(file), "r") ?: return null
             PdfRenderer(parcelFileDescriptor).use { render ->
                 val currentPage = render.openPage(0)
-                val bitmap = Bitmap.createBitmap(width ?: currentPage.width, height ?: currentPage.height, Bitmap.Config.ARGB_8888)
+                val bitmap = Bitmap.createBitmap(
+                    width ?: currentPage.width,
+                    height ?: currentPage.height,
+                    Bitmap.Config.ARGB_8888
+                )
                 bitmap.eraseColor(Color.WHITE)
                 currentPage.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                 currentPage.close()
