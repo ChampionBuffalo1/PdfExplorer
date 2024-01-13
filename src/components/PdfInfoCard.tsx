@@ -15,7 +15,7 @@ export default function PdfInfoCard({ name, path, isVisible }: InfoCardProps) {
   const [metadata, setMetadata] = useState<CachedFileData>();
 
   useEffect(() => {
-    if (isVisible) {
+    if (isVisible && name) {
       const file = getFileFromCache(name);
       if (file) {
         setMetadata(file);
@@ -32,7 +32,7 @@ export default function PdfInfoCard({ name, path, isVisible }: InfoCardProps) {
           .then(base64Image => {
             const thumbnail = `data:image/jpeg;base64,${base64Image}`;
             setImageUri(thumbnail);
-            fileRecord['thumbnail'] = thumbnail;
+            fileRecord.thumbnail = thumbnail;
             if (thumbnail) {
               setFileCache(name, fileRecord);
             }
@@ -40,7 +40,7 @@ export default function PdfInfoCard({ name, path, isVisible }: InfoCardProps) {
           .catch(console.error);
       }
     }
-  }, [isVisible]);
+  }, [name, path, isVisible]);
 
   return (
     <TouchableOpacity

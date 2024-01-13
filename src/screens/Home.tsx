@@ -16,13 +16,14 @@ export default function Home() {
     ]);
   }, []);
 
-  if (Platform.OS !== 'android')
+  if (Platform.OS !== 'android') {
     return (
       <Text>
         The App currently uses an Android only API and is not available on other
         platforms
       </Text>
     );
+  }
 
   return (
     <View className="bg-[#0a0a08] w-full h-full">
