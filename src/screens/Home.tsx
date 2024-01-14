@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { requestPermission } from '../utils';
 import RenderFiles from '../components/RenderFiles';
-import { View, Text, Platform } from 'react-native';
-import { PERMISSIONS } from 'react-native-permissions';
 import FilterButton from '../components/FilterButton';
+import { PERMISSIONS } from 'react-native-permissions';
+import { Text, Platform, ScrollView } from 'react-native';
 
 export default function Home() {
   useEffect(() => {
@@ -26,9 +26,9 @@ export default function Home() {
   }
 
   return (
-    <View className="bg-[#0a0a08] w-full h-full">
+    <ScrollView className="bg-[#0a0a08] w-full h-full">
       <FilterButton />
       <RenderFiles />
-    </View>
+    </ScrollView>
   );
 }

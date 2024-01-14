@@ -1,3 +1,4 @@
+import { View } from 'react-native';
 import PdfInfoCard from './PdfInfoCard';
 import { useState, useEffect } from 'react';
 import { FlashList } from '@shopify/flash-list';
@@ -12,22 +13,24 @@ export default function RenderFiles() {
   }, []);
 
   return (
-    <FlashList
-      data={pdfFiles}
-      extraData={inViewKeys}
-      keyExtractor={item => item.path}
-      renderItem={({ item, extraData }) => (
-        <PdfInfoCard {...item} isVisible={extraData.includes(item.path)} />
-      )}
-      onViewableItemsChanged={info =>
-        setInViewKeys(info.viewableItems.map(item => item.key))
-      }
-      viewabilityConfig={{
-        itemVisiblePercentThreshold: 40,
-        minimumViewTime: 500, // 0.5s
-      }}
-      // Use the element Inspector (in DevMenu) to find the size of the item
-      estimatedItemSize={360}
-    />
+    <View className='min-h-[2px]'>
+      <FlashList
+        data={pdfFiles}
+        extraData={inViewKeys}
+        keyExtractor={item => item.path}
+        renderItem={({ item, extraData }) => (
+          <PdfInfoCard {...item} isVisible={extraData.includes(item.path)} />
+        )}
+        onViewableItemsChanged={info =>
+          setInViewKeys(info.viewableItems.map(item => item.key))
+        }
+        viewabilityConfig={{
+          itemVisiblePercentThreshold: 40,
+          minimumViewTime: 500, // 0.5s
+        }}
+        // Use the element Inspector (in DevMenu) to find the size of the item
+        estimatedItemSize={360}
+      />
+    </View>
   );
 }
