@@ -33,7 +33,7 @@ export default function PdfInfoCard({ name, path, isVisible }: InfoCardProps) {
             const thumbnail = `data:image/jpeg;base64,${base64Image}`;
             setImageUri(thumbnail);
             fileRecord.thumbnail = thumbnail;
-            if (thumbnail) {
+            if (base64Image) {
               setFileCache(name, fileRecord);
             }
           })
