@@ -3,18 +3,25 @@ import shortHash from 'shorthash2';
 
 export const store = new MMKV();
 
+const THUMBNAIL_EXT = '.thumb';
 const getKey = (name: string): string => shortHash(name);
+const getThumbnailKey = (name: string): string => getKey(name) + THUMBNAIL_EXT;
 
+export function saveThumbnail(fileName: string, b64thumbnail: string): void {
+  store.set(getThumbnailKey(fileName), b64thumbnail);
+}
+export function getThumbnail(fileName: string): string | undefined {
+  return store.getString(getThumbnailKey(fileName));
+}
+export function removeThumbnail(fileName: string): void {
+  return store.delete(getThumbnailKey(fileName));
+}
 /**
  * Puts data in cache
  */
-export function setFileCache(fileName: string, value: CachedFileData): boolean {
+export function setFileCache(fileName: string, value: CachedFileData): void {
   const key = getKey(fileName);
-  if (store.contains(key)) {
-    return false;
-  }
   store.set(key, JSON.stringify(value));
-  return true;
 }
 
 /**
@@ -38,14 +45,13 @@ export function removeFileFromCache(fileName: string): boolean {
     return false;
   }
   store.delete(key);
-  return store.contains(key);
+  return true;
 }
 
 type FileStatus = 'COMPLETED' | 'NOT_STARTED' | 'ONGOING';
 export interface CachedFileData {
   path: string;
   modifiedAt?: Date;
-  thumbnail: string;
   totalPages: number;
   currentPage: number;
   status: FileStatus;

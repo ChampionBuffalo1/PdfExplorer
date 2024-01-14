@@ -2,7 +2,7 @@ import { FileInfo } from '../utils';
 import MediaStore from '../MediaStore';
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { setFileCache, CachedFileData, getFileFromCache } from '../kvStore';
+import { getThumbnail, saveThumbnail } from '../kvStore';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
 type InfoCardProps = FileInfo & {
@@ -12,29 +12,19 @@ type InfoCardProps = FileInfo & {
 export default function PdfInfoCard({ name, path, isVisible }: InfoCardProps) {
   const navigation = useNavigation();
   const [imageUri, setImageUri] = useState<string>('');
-  const [metadata, setMetadata] = useState<CachedFileData>();
 
   useEffect(() => {
     if (isVisible && name) {
-      const file = getFileFromCache(name);
-      if (file) {
-        setMetadata(file);
-        setImageUri(file.thumbnail);
+      const thumbnail = getThumbnail(name);
+      if (thumbnail) {
+        setImageUri(thumbnail);
       } else {
-        const fileRecord: CachedFileData = {
-          path,
-          totalPages: 0,
-          currentPage: 0,
-          status: 'NOT_STARTED',
-          thumbnail: '',
-        };
         MediaStore.getThumbnailWithOptions(path, 60, 360, 480)
           .then(base64Image => {
             const thumbnail = `data:image/jpeg;base64,${base64Image}`;
             setImageUri(thumbnail);
-            fileRecord.thumbnail = thumbnail;
             if (base64Image) {
-              setFileCache(name, fileRecord);
+              saveThumbnail(name, thumbnail);
             }
           })
           .catch(console.error);
