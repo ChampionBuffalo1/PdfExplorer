@@ -1,8 +1,9 @@
+import 'react-native-gesture-handler';
 import Home from './src/screens/Home';
 import type { ReactElement } from 'react';
 import PdfView from './src/screens/PdfView';
 import Header from './src/components/Header';
-import type { StackNavigator } from './NavigationTypes';
+import type { StackNavigator } from './src/NavigationTypes';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
