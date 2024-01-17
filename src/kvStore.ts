@@ -48,7 +48,7 @@ export function removeFileFromCache(fileName: string): boolean {
   return true;
 }
 
-type FileStatus = 'COMPLETED' | 'NOT_STARTED' | 'ONGOING';
+export type FileStatus = 'COMPLETED' | 'NOT_STARTED' | 'ONGOING';
 export interface CachedFileData {
   path: string;
   modifiedAt?: Date;

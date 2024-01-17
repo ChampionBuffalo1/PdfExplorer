@@ -1,5 +1,6 @@
 import RNFS from 'react-native-fs';
 import { BackHandler } from 'react-native';
+import { CachedFileData, FileStatus } from './kvStore';
 import { check, request, RESULTS, Permission } from 'react-native-permissions';
 
 export function requestPermission(permissions: Permission[]) {
@@ -50,4 +51,12 @@ export async function getPdfFiles(path = ''): Promise<FileInfo[]> {
     }
   }
   return files;
+}
+
+export function getFileType(cache?: CachedFileData): FileStatus {
+  if (!cache) return 'NOT_STARTED';
+  if (cache.currentPage === cache.totalPages) {
+    return 'COMPLETED';
+  }
+  return 'ONGOING';
 }
