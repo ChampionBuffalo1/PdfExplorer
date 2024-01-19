@@ -43,10 +43,10 @@ export default function PdfView({ route }: StackScreenProps<'PdfView'>) {
     if (!fileName.current) {
       return;
     }
-
     // Saving state to cache
     const cacheData =
       getFileFromCache(fileName.current) || ({} as CachedFileData);
+    if (cacheData.currentPage === pageDataRef.current.currentPage) return;
     const { totalPages, currentPage } = pageDataRef.current;
     setFileCache(fileName.current, {
       ...cacheData,
