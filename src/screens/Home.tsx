@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import Footer from '../components/Footer';
 import { requestPermission } from '../utils';
 import RenderFiles from '../components/RenderFiles';
 import FilterButton from '../components/FilterButton';
@@ -29,6 +30,7 @@ export default function Home() {
     <ScrollView className="bg-[#0a0a08] w-full h-full">
       <FilterButton />
       <RenderFiles />
+      <Footer />
     </ScrollView>
   );
 }
