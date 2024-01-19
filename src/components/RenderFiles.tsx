@@ -13,7 +13,7 @@ export default function RenderFiles() {
   }, []);
 
   return (
-    <View className='min-h-[2px]'>
+    <View className="min-h-[2px]">
       <FlashList
         data={pdfFiles}
         extraData={inViewKeys}

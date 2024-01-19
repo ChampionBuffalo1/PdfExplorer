@@ -31,10 +31,10 @@ export default function PdfInfoCard({ name, path, isVisible }: InfoCardProps) {
       } else {
         MediaStore.getThumbnailWithOptions(path, 60, 360, 480)
           .then(base64Image => {
-            const thumbnail = `data:image/jpeg;base64,${base64Image}`;
-            setImageUri(thumbnail);
+            const newThumbnail = `data:image/jpeg;base64,${base64Image}`;
+            setImageUri(newThumbnail);
             if (base64Image) {
-              saveThumbnail(name, thumbnail);
+              saveThumbnail(name, newThumbnail);
             }
           })
           .catch(console.error);
@@ -47,7 +47,7 @@ export default function PdfInfoCard({ name, path, isVisible }: InfoCardProps) {
       className="h-20 mt-2"
       onPress={() => {
         // @ts-expect-error: Not Typed function
-        navigation.navigate('PdfView', { path });
+        navigation.navigate('PdfView', { path, name });
       }}>
       <View className="flex items-center flex-row h-full">
         <View className="items-center justify-center">
@@ -86,13 +86,3 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 });
-
-/**
- {Math.random() > 0.5 ? (
-    <StatusMessage type="ONGOING" pages={999} totalPages={1000} />
-  ) : Math.random() < 0.5 ? (
-    <StatusMessage type="NOT_STARTED" />
-  ) : (
-    <StatusMessage type="COMPLETED" />
-  )}
-*/

@@ -7,16 +7,12 @@ type StatusProps = {
   totalPages?: number;
 };
 
-export default function StatusMessage({
-  type,
-  page,
-  totalPages,
-}: StatusProps) {
+export default function StatusMessage({ type, page, totalPages }: StatusProps) {
   const gotPages = page && totalPages;
   let str = 'Start Reading',
     color = 'bg-green-600';
 
-  if (type === 'COMPLETED' || gotPages && page === totalPages) {
+  if (type === 'COMPLETED' || (gotPages && page === totalPages)) {
     str = 'Completed';
     color = 'bg-blue-600 ';
   } else if (type === 'ONGOING' && gotPages) {

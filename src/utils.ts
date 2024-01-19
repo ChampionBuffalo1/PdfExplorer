@@ -54,7 +54,9 @@ export async function getPdfFiles(path = ''): Promise<FileInfo[]> {
 }
 
 export function getFileType(cache?: CachedFileData): FileStatus {
-  if (!cache) return 'NOT_STARTED';
+  if (!cache) {
+    return 'NOT_STARTED';
+  }
   if (cache.currentPage === cache.totalPages) {
     return 'COMPLETED';
   }
