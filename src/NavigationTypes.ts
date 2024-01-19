@@ -5,6 +5,7 @@ import {
 
 interface PdfViewerType {
   path: string;
+  name: string;
 }
 
 export type StackNavigator = {

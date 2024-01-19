@@ -43,7 +43,6 @@ export default function PdfView({ route }: StackScreenProps<'PdfView'>) {
     if (!fileName.current) {
       return;
     }
-    console.log('Flushing the state');
 
     // Saving state to cache
     const cacheData =
