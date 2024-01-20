@@ -1,18 +1,11 @@
+import PdfHeader from './PdfHeader';
 import { PageData } from '../screens/PdfView';
 import { FlashList } from '@shopify/flash-list';
 import { ArrowBigDown } from 'lucide-react-native';
 import Pdf, { TableContent } from 'react-native-pdf';
 import { Pressable, Text, View } from 'react-native';
-import PdfHeader from './PdfHeader';
 
-export type DrawerProps<T extends 'item' | 'drawer' = 'drawer'> = {
-  PDF: Pdf;
-  close: () => void;
-  pageData: T extends 'item' ? undefined : PageData;
-  content: T extends 'item' ? TableContent : TableContent[];
-};
-
-function DrawerItem({ content, close, PDF }: DrawerProps<'item'>) {
+function DrawerItem({ content, close, PDF }: DrawerItemProps) {
   const hasNested = content.children.length > 0;
   return (
     <View
@@ -36,10 +29,9 @@ function DrawerItem({ content, close, PDF }: DrawerProps<'item'>) {
       <View className="left-4">
         {content.children.map((childContent, index) => (
           <DrawerItem
-            pageData={undefined}
+            PDF={PDF}
             key={index}
             close={close}
-            PDF={PDF}
             content={childContent}
           />
         ))}
@@ -59,13 +51,7 @@ export default function PdfDrawer({
       data={content}
       estimatedItemSize={200}
       renderItem={({ item, index }) => (
-        <DrawerItem
-          pageData={undefined}
-          key={index}
-          close={close}
-          PDF={PDF}
-          content={item}
-        />
+        <DrawerItem PDF={PDF} key={index} close={close} content={item} />
       )}
       ListHeaderComponent={
         <PdfHeader pageData={pageData} PDF={PDF} close={close} />
@@ -75,3 +61,14 @@ export default function PdfDrawer({
     />
   );
 }
+
+export type DrawerProps = {
+  PDF: Pdf;
+  close: () => void;
+  pageData: PageData;
+  content: TableContent[];
+};
+
+type DrawerItemProps = Omit<DrawerProps, 'content' | 'pageData'> & {
+  content: TableContent;
+};

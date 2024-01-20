@@ -1,5 +1,5 @@
-import { Text, TextInput, View } from 'react-native';
 import { DrawerProps } from './PdfDrawer';
+import { Text, TextInput, View } from 'react-native';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export default function PdfHeader({
@@ -7,46 +7,52 @@ export default function PdfHeader({
   close,
   pageData,
 }: Omit<DrawerProps, 'content'>) {
-  const [newPage, setNewPage] = useState<number>(pageData.currentPage);
+  const [newPage, setNewPage] = useState<string>(
+    pageData.currentPage.toString(),
+  );
 
   useEffect(() => {
-    setNewPage(pageData.currentPage);
+    setNewPage(pageData.currentPage.toString());
   }, [pageData.currentPage]);
 
   const maxDigits = useMemo(() => {
-    if (pageData?.totalPages && pageData.totalPages !== -1) {
+    if (pageData.totalPages && pageData.totalPages !== -1) {
       return Math.ceil(Math.log10(pageData.totalPages));
     }
     return 1;
   }, [pageData]);
 
   const handlePageChange = useCallback(() => {
-    if (newPage && newPage > 1 && newPage < pageData.totalPages) {
+    const page = parseInt(newPage, 10);
+    if (
+      newPage &&
+      Number.isSafeInteger(page) &&
+      page >= 1 &&
+      page <= pageData.totalPages
+    ) {
       close();
-      PDF.setPage(newPage);
+      PDF.setPage(page);
     }
-  }, [PDF, newPage, pageData]);
+  }, [PDF, newPage, pageData, close]);
 
   return (
     <View>
       <View className="flex flex-row justify-center">
         <View className="flex flex-row items-center bg-slate-200 mt-2 rounded-sm">
           <TextInput
+            value={newPage}
             className="text-black"
             keyboardType="numeric"
             maxLength={maxDigits}
             onEndEditing={handlePageChange}
             onSubmitEditing={handlePageChange}
-            onChangeText={(page: string) => setNewPage(parseInt(page, 10))}
-            value={
-              newPage > 0 ? newPage.toString() : pageData.currentPage.toString()
-            }
+            onChangeText={(page: string) => setNewPage(page)}
           />
           <Text className="text-black">/</Text>
           <TextInput
             editable={false}
             className="text-black"
-            value={pageData?.totalPages.toString() || ''}
+            value={pageData.totalPages.toString() || ''}
           />
         </View>
       </View>
