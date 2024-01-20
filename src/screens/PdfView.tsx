@@ -22,7 +22,8 @@ export default function PdfView({
     totalPages: -1,
   });
 
-  const closeDrawer = useCallback(() => setOpen(false), []);
+  const handleDrawerOpen = useCallback(() => setOpen(true), []);
+  const handleDrawerClose = useCallback(() => setOpen(false), []);
 
   const drawerContent = useCallback(() => {
     if (PdfRef.current) {
@@ -30,11 +31,11 @@ export default function PdfView({
         <PdfDrawer
           content={toc.current}
           PDF={PdfRef.current}
-          close={closeDrawer}
+          close={handleDrawerClose}
         />
       );
     }
-  }, [toc, PdfRef, closeDrawer]);
+  }, [toc, PdfRef, handleDrawerClose]);
 
   const onPdfLoad = useCallback(() => {
     // Restore state from cache
@@ -84,14 +85,16 @@ export default function PdfView({
   return (
     <Drawer
       open={open}
-      onOpen={() => setOpen(true)}
-      onClose={closeDrawer}
+      onOpen={handleDrawerOpen}
+      onClose={handleDrawerClose}
       renderDrawerContent={drawerContent}>
       <View className="flex-1 items-center justify-start">
         {uri && (
           <Pdf
-            enableAntialiasing
             ref={PdfRef}
+            source={{ uri }}
+            style={style.pdf}
+            enableAntialiasing
             showsVerticalScrollIndicator
             onLoadComplete={(totalPages, _path, _size, tableofContent) => {
               pageDataRef.current.totalPages = totalPages;
@@ -99,10 +102,6 @@ export default function PdfView({
                 toc.current = tableofContent;
               }
               onPdfLoad();
-            }}
-            style={style.pdf}
-            source={{
-              uri,
             }}
             onPageChanged={currentPage => {
               pageDataRef.current.currentPage = currentPage;
