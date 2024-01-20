@@ -6,7 +6,7 @@ import { Dimensions, View, StyleSheet } from 'react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CachedFileData, getFileFromCache, setFileCache } from '../kvStore';
 
-type PageData = { currentPage: number; totalPages: number };
+export type PageData = { currentPage: number; totalPages: number };
 
 export default function PdfView({
   route,
@@ -29,13 +29,14 @@ export default function PdfView({
     if (PdfRef.current) {
       return (
         <PdfDrawer
-          content={toc.current}
           PDF={PdfRef.current}
+          content={toc.current}
           close={handleDrawerClose}
+          pageData={pageDataRef.current}
         />
       );
     }
-  }, [toc, PdfRef, handleDrawerClose]);
+  }, [toc, pageDataRef, PdfRef, handleDrawerClose]);
 
   const onPdfLoad = useCallback(() => {
     // Restore state from cache

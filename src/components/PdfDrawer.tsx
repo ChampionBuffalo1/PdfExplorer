@@ -1,15 +1,18 @@
+import { PageData } from '../screens/PdfView';
 import { FlashList } from '@shopify/flash-list';
 import { ArrowBigDown } from 'lucide-react-native';
+import Pdf, { TableContent } from 'react-native-pdf';
 import { Pressable, Text, View } from 'react-native';
-import Pdf, { type TableContent } from 'react-native-pdf';
+import PdfHeader from './PdfHeader';
 
-type DrawerProps<T extends 'item' | 'drawer' = 'drawer'> = {
+export type DrawerProps<T extends 'item' | 'drawer' = 'drawer'> = {
   PDF: Pdf;
-  content: T extends 'item' ? TableContent : TableContent[];
   close: () => void;
+  pageData: T extends 'item' ? undefined : PageData;
+  content: T extends 'item' ? TableContent : TableContent[];
 };
 
-function DrawerItem({ content, PDF, close }: DrawerProps<'item'>) {
+function DrawerItem({ content, close, PDF }: DrawerProps<'item'>) {
   const hasNested = content.children.length > 0;
   return (
     <View
@@ -33,10 +36,11 @@ function DrawerItem({ content, PDF, close }: DrawerProps<'item'>) {
       <View className="left-4">
         {content.children.map((childContent, index) => (
           <DrawerItem
-            content={childContent}
-            PDF={PDF}
+            pageData={undefined}
             key={index}
             close={close}
+            PDF={PDF}
+            content={childContent}
           />
         ))}
       </View>
@@ -44,14 +48,30 @@ function DrawerItem({ content, PDF, close }: DrawerProps<'item'>) {
   );
 }
 
-export default function PdfDrawer({ content, PDF, close }: DrawerProps) {
+export default function PdfDrawer({
+  PDF,
+  close,
+  content,
+  pageData,
+}: DrawerProps) {
   return (
     <FlashList
       data={content}
-      renderItem={({ item, index }) => (
-        <DrawerItem content={item} PDF={PDF} key={index} close={close} />
-      )}
       estimatedItemSize={200}
+      renderItem={({ item, index }) => (
+        <DrawerItem
+          pageData={undefined}
+          key={index}
+          close={close}
+          PDF={PDF}
+          content={item}
+        />
+      )}
+      ListHeaderComponent={
+        <PdfHeader pageData={pageData} PDF={PDF} close={close} />
+      }
+      ListFooterComponent={<View className="mt-10" />}
+      ListEmptyComponent={<Text className="text-black text-md">Empty</Text>}
     />
   );
 }
