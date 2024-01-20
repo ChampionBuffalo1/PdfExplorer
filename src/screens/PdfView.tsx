@@ -17,6 +17,7 @@ export default function PdfView({
   const toc = useRef<TableContent[]>([]);
   const [open, setOpen] = useState(false);
   const [uri, setUri] = useState<string>('');
+  const pdfLoadedOnce = useRef<boolean>(false);
   const pageDataRef = useRef<PageData>({
     currentPage: -1,
     totalPages: -1,
@@ -50,7 +51,7 @@ export default function PdfView({
       }
       PdfRef.current.setPage(cacheData.currentPage);
     }
-  }, [fileName, PdfRef]);
+  }, [uri, fileName, PdfRef]);
 
   const onUnmount = useCallback(() => {
     if (!fileName.current) {
@@ -97,15 +98,21 @@ export default function PdfView({
             style={style.pdf}
             enableAntialiasing
             showsVerticalScrollIndicator
+            onPageChanged={currentPage =>
+              (pageDataRef.current.currentPage = currentPage)
+            }
             onLoadComplete={(totalPages, _path, _size, tableofContent) => {
+              // Each change to pdf page using `Pdf.setPage` causes state change hence re-render
+              // which causes `onPdfLoad()` to be called multiple times instead of just once
+              // which leads to semi-race condition where if cache is faster than page load then
+              // page with end up loading otherwise the page stored in cache will be loaded instead of the value of `setPage(num)`
+              if (pdfLoadedOnce.current) return;
+              pdfLoadedOnce.current = true;
               pageDataRef.current.totalPages = totalPages;
               if (tableofContent) {
                 toc.current = tableofContent;
               }
               onPdfLoad();
-            }}
-            onPageChanged={currentPage => {
-              pageDataRef.current.currentPage = currentPage;
             }}
           />
         )}
