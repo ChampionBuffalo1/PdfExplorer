@@ -6,8 +6,6 @@ import { Dimensions, View, StyleSheet } from 'react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CachedFileData, getFileFromCache, setFileCache } from '../kvStore';
 
-export type PageData = { currentPage: number; totalPages: number };
-
 export default function PdfView({
   route,
   navigation,
@@ -104,8 +102,9 @@ export default function PdfView({
             onLoadComplete={(totalPages, _path, _size, tableofContent) => {
               // Each change to pdf page using `Pdf.setPage` causes state change hence re-render
               // which causes `onPdfLoad()` to be called multiple times instead of just once
-              // which leads to semi-race condition where if cache is faster than page load then
-              // page with end up loading otherwise the page stored in cache will be loaded instead of the value of `setPage(num)`
+              // which leads to race condition between cache page load and page load from `setPage` invocation
+              // if the cache is faster than `setPage(clicked_page_num)` then the clicked page will end up loading (rather replacing)
+              //  otherwise the page stored in cache will be loaded with `setPage(cache_page_num)`. 
               if (pdfLoadedOnce.current) return;
               pdfLoadedOnce.current = true;
               pageDataRef.current.totalPages = totalPages;
@@ -128,3 +127,5 @@ const style = StyleSheet.create({
     height: Dimensions.get('window').height,
   },
 });
+
+export type PageData = { currentPage: number; totalPages: number };
