@@ -2,13 +2,16 @@ import PdfDrawer from '../components/PdfDrawer';
 import { Drawer } from 'react-native-drawer-layout';
 import Pdf, { TableContent } from 'react-native-pdf';
 import type { StackScreenProps } from '../NavigationTypes';
+import { Dimensions, View, StyleSheet } from 'react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Dimensions, View, Text, StyleSheet } from 'react-native';
 import { CachedFileData, getFileFromCache, setFileCache } from '../kvStore';
 
 type PageData = { currentPage: number; totalPages: number };
 
-export default function PdfView({ route }: StackScreenProps<'PdfView'>) {
+export default function PdfView({
+  route,
+  navigation,
+}: StackScreenProps<'PdfView'>) {
   const PdfRef = useRef<Pdf>(null);
   const fileName = useRef<string>('');
   const toc = useRef<TableContent[]>([]);
@@ -19,11 +22,19 @@ export default function PdfView({ route }: StackScreenProps<'PdfView'>) {
     totalPages: -1,
   });
 
+  const closeDrawer = useCallback(() => setOpen(false), []);
+
   const drawerContent = useCallback(() => {
     if (PdfRef.current) {
-      return <PdfDrawer content={toc.current} PDF={PdfRef.current} />;
+      return (
+        <PdfDrawer
+          content={toc.current}
+          PDF={PdfRef.current}
+          close={closeDrawer}
+        />
+      );
     }
-  }, [toc, PdfRef]);
+  }, [toc, PdfRef, closeDrawer]);
 
   const onPdfLoad = useCallback(() => {
     // Restore state from cache
@@ -46,7 +57,9 @@ export default function PdfView({ route }: StackScreenProps<'PdfView'>) {
     // Saving state to cache
     const cacheData =
       getFileFromCache(fileName.current) || ({} as CachedFileData);
-    if (cacheData.currentPage === pageDataRef.current.currentPage) return;
+    if (cacheData.currentPage === pageDataRef.current.currentPage) {
+      return;
+    }
     const { totalPages, currentPage } = pageDataRef.current;
     setFileCache(fileName.current, {
       ...cacheData,
@@ -60,19 +73,24 @@ export default function PdfView({ route }: StackScreenProps<'PdfView'>) {
   useEffect(() => {
     if (route.params) {
       fileName.current = route.params.name;
-      setUri(route.params.path);
+      if (route.params.path) {
+        setUri(route.params.path);
+      } else {
+        navigation.goBack();
+      }
     }
-  }, [route, setUri]);
+  }, [route, navigation, setUri]);
 
   return (
     <Drawer
       open={open}
       onOpen={() => setOpen(true)}
-      onClose={() => setOpen(false)}
+      onClose={closeDrawer}
       renderDrawerContent={drawerContent}>
       <View className="flex-1 items-center justify-start">
         {uri && (
           <Pdf
+            enableAntialiasing
             ref={PdfRef}
             showsVerticalScrollIndicator
             onLoadComplete={(totalPages, _path, _size, tableofContent) => {
@@ -91,7 +109,6 @@ export default function PdfView({ route }: StackScreenProps<'PdfView'>) {
             }}
           />
         )}
-        {!uri && <Text className="text-black">No File Found</Text>}
       </View>
     </Drawer>
   );
