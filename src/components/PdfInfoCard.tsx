@@ -1,8 +1,8 @@
-import { FileInfo, getFileType } from '../utils';
 import MediaStore from '../MediaStore';
-import { useEffect, useState } from 'react';
 import StatusMessage from './StatusMessage';
-import { useNavigation } from '@react-navigation/native';
+import { useCallback, useState } from 'react';
+import { FileInfo, getFileType } from '../utils';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import {
   getThumbnail,
@@ -11,19 +11,15 @@ import {
   getFileFromCache,
 } from '../kvStore';
 
-type InfoCardProps = FileInfo & {
-  isVisible: boolean;
-};
-
-export default function PdfInfoCard({ name, path, isVisible }: InfoCardProps) {
+export default function PdfInfoCard({ name, path }: FileInfo) {
   const navigation = useNavigation();
   const [imageUri, setImageUri] = useState<string>('');
   const [fileData, setFileData] = useState<CachedFileData | undefined>(
     undefined,
   );
 
-  useEffect(() => {
-    if (isVisible && name) {
+  const onMount = useCallback(() => {
+    if (name) {
       setFileData(getFileFromCache(name));
       const thumbnail = getThumbnail(name);
       if (thumbnail) {
@@ -40,7 +36,9 @@ export default function PdfInfoCard({ name, path, isVisible }: InfoCardProps) {
           .catch(console.error);
       }
     }
-  }, [name, path, isVisible]);
+  }, [name, path]);
+
+  useFocusEffect(onMount);
 
   return (
     <TouchableOpacity
