@@ -1,10 +1,8 @@
 import { useEffect } from 'react';
-import Footer from '../components/Footer';
+import MainScreen from './MainScreen';
 import { requestPermission } from '../utils';
-import RenderFiles from '../components/RenderFiles';
-import FilterButton from '../components/FilterButton';
+import { Text, Platform } from 'react-native';
 import { PERMISSIONS } from 'react-native-permissions';
-import { Text, Platform, ScrollView } from 'react-native';
 
 export default function Home() {
   useEffect(() => {
@@ -26,11 +24,5 @@ export default function Home() {
     );
   }
 
-  return (
-    <ScrollView className="bg-[#0a0a08] w-full h-full">
-      <FilterButton />
-      <RenderFiles />
-      <Footer />
-    </ScrollView>
-  );
+  return <MainScreen />;
 }
