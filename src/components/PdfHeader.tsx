@@ -41,7 +41,7 @@ export default function PdfHeader({
         <View className="flex flex-row items-center bg-slate-200 mt-2 rounded-sm">
           <TextInput
             value={newPage}
-            className="text-black"
+            className="text-black text-center"
             keyboardType="numeric"
             maxLength={maxDigits}
             onEndEditing={handlePageChange}
@@ -51,7 +51,7 @@ export default function PdfHeader({
           <Text className="text-black">/</Text>
           <TextInput
             editable={false}
-            className="text-black"
+            className="text-black text-center"
             value={pageData.totalPages.toString() || ''}
           />
         </View>
