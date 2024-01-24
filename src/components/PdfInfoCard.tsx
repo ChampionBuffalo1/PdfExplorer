@@ -47,7 +47,7 @@ export default function PdfInfoCard({ name, path }: FileInfo) {
         // @ts-expect-error: Not Typed function
         navigation.navigate('PdfView', { path, name });
       }}>
-      <View className="flex items-center flex-row h-full">
+      <View className="flex flex-row items-center  h-full">
         <View className="items-center justify-center">
           {imageUri && (
             <Image
@@ -59,7 +59,7 @@ export default function PdfInfoCard({ name, path }: FileInfo) {
           )}
         </View>
 
-        <View className="left-1 flex justify-center">
+        <View className="left-1 justify-center">
           <Text
             className="text-sm text-white whitespace-nowrap"
             lineBreakMode="tail">
