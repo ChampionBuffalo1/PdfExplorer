@@ -47,13 +47,10 @@ export function removeFileFromCache(fileName: string): boolean {
   store.delete(key);
   return true;
 }
-
+// Accessed using `getFileType` fn
 export type FileStatus = 'COMPLETED' | 'NOT_STARTED' | 'ONGOING';
 export interface CachedFileData {
-  path: string;
-  modifiedAt?: Date;
   totalPages: number;
   currentPage: number;
-  status: FileStatus;
   isPasswordProtected?: boolean;
 }
