@@ -3,9 +3,9 @@ import EmptyList from '../components/EmptyList';
 import { FlashList } from '@shopify/flash-list';
 import { getPdfFiles, FileInfo } from '../utils';
 import PdfInfoCard from '../components/PdfInfoCard';
-import { RefreshControl, View } from 'react-native';
 import FilterButton from '../components/FilterButton';
 import { useState, useEffect, useCallback } from 'react';
+import { View, PermissionsAndroid, RefreshControl } from 'react-native';
 
 export default function MainScreen() {
   const [pdfFiles, setPdfFiles] = useState<FileInfo[]>([]);
@@ -13,14 +13,22 @@ export default function MainScreen() {
 
   const loadFiles = useCallback(() => {
     setRefreshing(true);
-    getPdfFiles().then(files => {
-      setPdfFiles(files);
-      setRefreshing(false);
-    });
+    getPdfFiles()
+      .then(files => {
+        setPdfFiles(files);
+        setRefreshing(false);
+      })
+      .catch(console.error);
   }, []);
 
   useEffect(() => {
-    loadFiles();
+    PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+    ).then(result => {
+      if (result) {
+        loadFiles();
+      }
+    });
   }, [loadFiles]);
 
   return (
