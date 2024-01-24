@@ -49,7 +49,7 @@ export default function PdfView({
       }
       PdfRef.current.setPage(cacheData.currentPage);
     }
-  }, [uri, fileName, PdfRef]);
+  }, [fileName, PdfRef]);
 
   const onUnmount = useCallback(() => {
     if (!fileName.current) {
@@ -104,8 +104,10 @@ export default function PdfView({
               // which causes `onPdfLoad()` to be called multiple times instead of just once
               // which leads to race condition between cache page load and page load from `setPage` invocation
               // if the cache is faster than `setPage(clicked_page_num)` then the clicked page will end up loading (rather replacing)
-              //  otherwise the page stored in cache will be loaded with `setPage(cache_page_num)`. 
-              if (pdfLoadedOnce.current) return;
+              //  otherwise the page stored in cache will be loaded with `setPage(cache_page_num)`.
+              if (pdfLoadedOnce.current) {
+                return;
+              }
               pdfLoadedOnce.current = true;
               pageDataRef.current.totalPages = totalPages;
               if (tableofContent) {
