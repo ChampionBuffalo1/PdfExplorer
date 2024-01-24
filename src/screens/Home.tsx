@@ -5,17 +5,15 @@ import BootSplash from 'react-native-bootsplash';
 import { Text, Platform, PermissionsAndroid } from 'react-native';
 
 export default function Home() {
-  // const [] = useState<boolean>(false)
   useEffect(() => {
     if (Platform.OS !== 'android') {
+      // Remove the splashscreen to show error message
+      BootSplash.hide({ fade: true });
       return;
     }
     requestPermission([
       PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-    ]).then(() => {
-      BootSplash.hide({ fade: true });
-    });
+    ]).finally(() => BootSplash.hide({ fade: true }));
   }, []);
 
   if (Platform.OS !== 'android') {
