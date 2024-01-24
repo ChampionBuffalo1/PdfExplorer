@@ -10,6 +10,7 @@ import {
   CachedFileData,
   getFileFromCache,
 } from '../kvStore';
+import { FileLock2 } from 'lucide-react-native';
 
 export default function PdfInfoCard({ name, path }: FileInfo) {
   const navigation = useNavigation();
@@ -20,7 +21,11 @@ export default function PdfInfoCard({ name, path }: FileInfo) {
 
   const onMount = useCallback(() => {
     if (name) {
-      setFileData(getFileFromCache(name));
+      const metadata = getFileFromCache(name);
+      setFileData(metadata);
+      if (metadata?.isPasswordProtected) {
+        return;
+      }
       const thumbnail = getThumbnail(name);
       if (thumbnail) {
         setImageUri(thumbnail);
@@ -49,6 +54,12 @@ export default function PdfInfoCard({ name, path }: FileInfo) {
       }}>
       <View className="flex flex-row items-center  h-full">
         <View className="items-center justify-center">
+          {!imageUri && (
+            <View className="items-center justify-center w-20 h-full">
+              {/* <Text className="text-white">Loading...</Text> */}
+              <FileLock2 className="text-white" />
+            </View>
+          )}
           {imageUri && (
             <Image
               source={{
