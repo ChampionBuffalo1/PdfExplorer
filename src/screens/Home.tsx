@@ -1,28 +1,30 @@
 import { useEffect } from 'react';
 import MainScreen from './MainScreen';
 import { requestPermission } from '../utils';
-import { Text, Platform } from 'react-native';
-import { PERMISSIONS } from 'react-native-permissions';
+import BootSplash from 'react-native-bootsplash';
+import { Text, Platform, PermissionsAndroid } from 'react-native';
 
 export default function Home() {
+  // const [] = useState<boolean>(false)
   useEffect(() => {
     if (Platform.OS !== 'android') {
       return;
     }
     requestPermission([
-      PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-      PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-    ]);
+      PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+    ]).then(() => {
+      BootSplash.hide({ fade: true });
+    });
   }, []);
 
   if (Platform.OS !== 'android') {
     return (
-      <Text>
+      <Text className="text-black">
         The App currently uses an Android only API and is not available on other
         platforms
       </Text>
     );
   }
-
   return <MainScreen />;
 }
