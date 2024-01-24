@@ -2,7 +2,9 @@ import RNFS from 'react-native-fs';
 import { CachedFileData, FileStatus } from './kvStore';
 import { Permission, BackHandler, PermissionsAndroid } from 'react-native';
 
-export async function requestPermission(permissions: Permission[]) {
+export async function requestPermission(
+  permissions: Permission[],
+): Promise<void> {
   const missingPermissions: Permission[] = [];
 
   for (const permission of permissions) {
@@ -12,16 +14,15 @@ export async function requestPermission(permissions: Permission[]) {
     }
   }
 
-  PermissionsAndroid.requestMultiple(missingPermissions).then(perms => {
-    for (const [perm, permStatus] of Object.entries(perms)) {
-      if (missingPermissions.includes(perm as Permission)) {
-        if (permStatus !== 'granted') {
-          setTimeout(() => BackHandler.exitApp(), 1000);
-          break;
-        }
+  const perms = await PermissionsAndroid.requestMultiple(missingPermissions);
+  for (const [perm, permStatus] of Object.entries(perms)) {
+    if (missingPermissions.includes(perm as Permission)) {
+      if (permStatus !== 'granted') {
+        BackHandler.exitApp();
+        break;
       }
     }
-  });
+  }
 }
 
 export interface FileInfo {
