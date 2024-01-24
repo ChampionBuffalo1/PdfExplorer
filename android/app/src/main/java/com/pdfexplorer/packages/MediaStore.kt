@@ -1,12 +1,11 @@
 package com.pdfexplorer
 
-import android.graphics.Bitmap
 import android.content.ContentResolver
-import android.graphics.Color
+import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
-import android.util.Log
 import android.util.Base64
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
@@ -14,6 +13,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.IOException
 
 class MediaStoreModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext) {
@@ -43,11 +43,17 @@ class MediaStoreModule(reactContext: ReactApplicationContext) :
             return
         }
 
-        val thumbnail = generatePdfThumbnail(file, width, height) ?: run {
-            promise.reject("THUMBNAIL_GENERATION_ERROR", "Error generating PDF thumbnail")
-            return
+        val thumbnail: Bitmap? = try {
+            generatePdfThumbnail(file, width, height)
+        } catch (e: SecurityException) {
+            promise.reject("ENCRYPTED_PDF", "PDF cannot be opened with the password")
+            null
+        } catch (e: IOException) {
+            promise.reject("PDF_READ_ERROR", "Error while reading the PDF")
+            null
         }
-        val b64map = bitmapToBase64(thumbnail, quality ?: DEFAULT_QUALITY)
+
+        val b64map = thumbnail?.let { bitmapToBase64(it, quality ?: DEFAULT_QUALITY) }
         promise.resolve(b64map)
     }
 
