@@ -9,6 +9,7 @@ import { View, PermissionsAndroid, RefreshControl } from 'react-native';
 
 export default function MainScreen() {
   const [pdfFiles, setPdfFiles] = useState<FileInfo[]>([]);
+  const [predicate, setPredicate] = useState<PredicateType>();
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
   const loadFiles = useCallback(() => {
@@ -34,7 +35,7 @@ export default function MainScreen() {
   return (
     <View className="bg-[#0a0a08] w-full h-full min-h-[2px]">
       <FlashList
-        data={pdfFiles}
+        data={predicate ? pdfFiles.filter(predicate) : pdfFiles}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={loadFiles} />
         }
@@ -42,11 +43,13 @@ export default function MainScreen() {
         renderItem={({ item }) => <PdfInfoCard {...item} />}
         viewabilityConfig={{ itemVisiblePercentThreshold: 40 }}
         ListFooterComponent={Footer}
-        ListHeaderComponent={FilterButton}
         ListEmptyComponent={EmptyList}
+        ListHeaderComponent={<FilterButton setFilterFn={setPredicate} />}
         // Use the element Inspector (in DevMenu) to find the size of the item
         estimatedItemSize={360}
       />
     </View>
   );
 }
+
+export type PredicateType = ((files: FileInfo) => boolean) | undefined;
